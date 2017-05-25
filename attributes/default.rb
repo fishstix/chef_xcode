@@ -20,18 +20,21 @@
 
 case node["platform_version"]
 when /^10\.7/
-  default['xcode']['url'] = nil # should point to xcode4620419895a.dmg
-  default['xcode']['checksum'] = '3057224339823dae8a56943380a438065e92cff1ad4ab5a6a84f94f7a94dc035'
-  default["xcode"]["package_type"] = "dmg"
-  default['xcode']['last_gm_license'] = "EA0720"
-  default['xcode']['version'] = "4.6.2"
-
-  default['xcode']['cli']['url'] = nil # should point to xcode462_cltools_10_76938260a.dmg
-  default['xcode']['cli']['checksum'] = '20a3e1965c685c6c079ffe89b168c3975c9a106c4b33b89aeac93c8ffa4e0523'
-  default['xcode']['cli']['package_name'] = 'Command Line Tools (Lion)'
-  default['xcode']['cli']['package_type'] = 'mpkg'
-  default['xcode']['cli']['package_id'] = 'com.apple.pkg.DeveloperToolsCLI'
-  default['xcode']['cli']['volumes_dir'] = 'Command Line Tools (Lion)'
+  default['xcode'] = [{
+	'url' => nil, # should point to xcode4620419895a.dmg
+  	'checksum' => '3057224339823dae8a56943380a438065e92cff1ad4ab5a6a84f94f7a94dc035',
+	'package_type' => "dmg",
+	'last_gm_license' => "EA0720",
+	'version' => "4.6.2",
+	'cli' => {
+		'url' => nil, # should point to xcode462_cltools_10_76938260a.dmg
+		'checksum' => '20a3e1965c685c6c079ffe89b168c3975c9a106c4b33b89aeac93c8ffa4e0523',
+		'package_name' => 'Command Line Tools (Lion)',
+		'package_type' => 'mpkg',
+		'package_id' => 'com.apple.pkg.DeveloperToolsCLI',
+		'volumes_dir' => 'Command Line Tools (Lion)'
+	}
+  }]
 when /^10\.8/
   default["xcode"]["url"] = nil # should point to xcode_5.1.1.dmg
   default["xcode"]["checksum"] = "5bd3c1792b695dae3c96065a9cc02215ec2fab6aecbf708a66b7d19fa65ff967"

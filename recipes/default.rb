@@ -17,32 +17,34 @@
 # limitations under the License.
 #
 
-Chef::Log.info("xcode package type: '#{node['xcode']['package_type']}'.")
+#Chef::Log.info("xcode package type: '#{node['xcode']['package_type']}'.")
 
-case node['xcode']['package_type']
+node['xcode'].each do |xcode|
+case xcode['package_type']
 when 'dmg'
   dmg_package "Xcode" do
-    source node['xcode']['url']
-    checksum node['xcode']['checksum']
+    source xcode['url']
+    checksum xcode['checksum']
     action :install
   end
 when 'xip'
 
-  # TODO: add a version check. (i.e. "xcodebuild -version | grep #{node['xcode']['version']}")
+  # TODO: add a version check. (i.e. "xcodebuild -version | grep #{xcode['version']}")
   if ::Dir.exist? "/Applications/Xcode.app"
-    Chef::Log.info("xcode version #{node['xcode']['version']} is alread installed. Nothing to do.")
+    Chef::Log.info("xcode version #{xcode['version']} is alread installed. Nothing to do.")
   else
     # Instructions for how to install XCode via the command line were taken from:
     # http://stackoverflow.com/a/39489446
     Chef::Log.info("xcode is NOT installed.  Installing...")
 
     # extract the name of the archive from the download URL
-    file_name = File.basename(node['xcode']['url'])
+    file_name = File.basename(xcode['url'])
+    version_suffix = xcode['version'].try(".", "_")
 
     # download the remote xip archive
     remote_file "#{Chef::Config[:file_cache_path]}/#{file_name}" do
-      source node['xcode']['url']
-      checksum node['xcode']['checksum']
+      source xcode['url']
+      checksum xcode['checksum']
       backup false
       mode 0644
       owner "root"
@@ -85,7 +87,7 @@ when 'xip'
 
     # Move the resulting Xcode app bundle into /Applications
     execute 'Move the resulting Xcode app bundle into /Applications' do
-      command 'mv -f Xcode.app /Applications/Xcode.app'
+      command "mv -f Xcode.app /Applications/Xcode_#{version_suffix}.app"
       cwd Chef::Config[:file_cache_path]
     end
 
@@ -119,15 +121,15 @@ when 'xip'
     end
   end
 else
-  raise "Unsupported xcode package type #{node['xcode']['package_type']}!  Allowed types are ['dmg', 'xip']."
+  raise "Unsupported xcode package type #{xcode['package_type']}!  Allowed types are ['dmg', 'xip']."
 end
 
-dmg_package node['xcode']['cli']['package_name'] do
-  source node['xcode']['cli']['url']
-  checksum node['xcode']['cli']['checksum']
-  volumes_dir node['xcode']['cli']['volumes_dir']
-  type node['xcode']['cli']['package_type']
-  package_id node['xcode']['cli']['package_id']
+dmg_package node['xcode'].each do |xcode| #['cli']['package_name'] do
+  source xcode['cli']['url']
+  checksum xcode['cli']['checksum']
+  volumes_dir xcode['cli']['volumes_dir']
+  type xcode['cli']['package_type']
+  package_id xcode['cli']['package_id']
   action :install
 end
 
